@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f7fb">
+<title>Vigyázz, tízes lesz belőle! – Matematikai játék</title>
+<style>
+:root{--ink:#203047;--muted:#617187;--blue:#328bd1;--yellow:#e2a52b;--green:#23865e;--paper:#fff;--line:#dce4ed;--bg:#f3f6fa}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button{font:inherit;touch-action:manipulation;cursor:pointer}
+button:focus-visible{outline:4px solid #8b6de0;outline-offset:3px}
+main{max-width:920px;margin:auto;padding:clamp(12px,3vw,28px);padding-bottom:max(20px,env(safe-area-inset-bottom))}
+header{text-align:center;margin-bottom:16px}
+.kicker{font-weight:800;letter-spacing:.08em;font-size:.78rem;color:var(--muted)}
+h1{font-size:clamp(1.65rem,5vw,2.8rem);line-height:1.1;margin:8px 0;color:#b47a12}
+.subtitle{color:var(--muted);margin:8px 0}
+.tabs{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.tab{border:2px solid var(--line);background:white;border-radius:999px;padding:11px 20px;font-weight:800;color:var(--ink);min-height:48px}
+.tab.active{background:#243e59;color:white;border-color:#243e59}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:clamp(14px,3vw,26px);box-shadow:0 5px 20px #2030470c}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:.9rem;font-weight:700}
+.equation{font-size:clamp(2.4rem,9vw,4.7rem);font-weight:900;text-align:center;letter-spacing:.02em;margin:12px 0 4px}
+.instruction{text-align:center;color:var(--muted);font-weight:650;min-height:1.6em}
+.coins{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(5px,1.3vw,11px);padding:20px 4px;min-height:92px}
+.coin{width:clamp(23px,5.5vw,39px);height:clamp(23px,5.5vw,39px);border-radius:50%;border:3px solid #ffffffb8;box-shadow:inset -4px -5px 0 #00000012,0 2px 3px #0002;animation:pop .35s both}
+.coin.blue{background:var(--blue)}.coin.gold{background:var(--yellow)}
+.ten-group{display:flex;gap:3px;align-items:center;justify-content:center;flex-wrap:nowrap;padding:4px 6px;border:3px solid #176d4b;border-radius:10px;background:#23865e;animation:pop .55s both}
+.ten-cell{width:clamp(15px,3.8vw,25px);height:clamp(22px,5vw,34px);background:#55b68c;border:1px solid #d9f4e7;border-radius:3px}
+.remaining{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap}
+.practice-stacks{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;width:100%;padding:10px 0}
+.practice-row{display:flex;align-items:center;justify-content:center;gap:clamp(4px,1.5vw,9px);width:100%;min-height:36px;flex-wrap:nowrap}
+.practice-row .coin{width:clamp(23px,7vw,36px);height:clamp(23px,7vw,36px);flex:0 1 auto}
+.practice-row .row-label{display:none}
+.answer-columns{align-items:stretch}
+.answer-side{min-width:0}
+
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.action{border:0;border-radius:18px;color:white;min-height:clamp(92px,17vw,130px);padding:12px 8px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 0 #0002}
+.action .number{font-size:clamp(2rem,7vw,3.1rem);line-height:1}
+.action.left{background:var(--yellow)}.action.right{background:var(--green)}
+.action:disabled{opacity:.55;cursor:default;box-shadow:none}
+.action.done{outline:5px solid #243e59;outline-offset:2px}
+.message{min-height:2.3em;text-align:center;font-weight:750;margin:14px 0 4px}
+.primary,.secondary{border:0;border-radius:14px;padding:14px 20px;min-height:52px;font-weight:850}
+.primary{background:var(--blue);color:white}.secondary{background:white;border:2px solid var(--line);color:var(--ink)}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.hidden{display:none!important}
+.progress{height:9px;background:#e8edf3;border-radius:99px;overflow:hidden;flex:1}
+.progress>span{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.options{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:14px 0}
+.option{min-width:62px;min-height:58px;border:2px solid var(--line);border-radius:14px;background:white;font-size:1.6rem;font-weight:900;color:var(--ink)}
+.option.selected{background:#243e59;color:white;border-color:#243e59}
+.option:disabled{cursor:default}
+
+.purpose-box{margin:10px 0;background:#fff8e8;border-color:#f0dba9;color:#604a20;font-size:clamp(.88rem,2.8vw,1rem);line-height:1.45}
+.purpose-box strong{display:block;margin-bottom:4px;color:#8a6416}
+.written-work{width:250px;max-width:90%;margin:12px auto 8px;padding:8px 12px 10px;border-radius:12px;background:#f7f9fc;border:1px solid var(--line);font-family:ui-monospace,monospace;font-size:clamp(1.8rem,6vw,2.5rem);font-weight:900;line-height:1.12;color:var(--ink)}
+.place-head{display:grid;grid-template-columns:.8fr 1.2fr 1.2fr;column-gap:8px;text-align:center;font-family:Arial,sans-serif;font-size:.31em;font-weight:800;color:#718096;letter-spacing:.015em;margin-bottom:5px;white-space:nowrap}
+.carry-line,.sum-line{display:grid;grid-template-columns:.8fr 1.2fr 1.2fr;column-gap:8px;text-align:center;min-height:1.15em}
+.carry-line span:first-child{text-align:center;grid-column:2}
+.carry-line span:last-child{grid-column:3}
+.carry-line{font-size:.68em;color:#23865e;min-height:.58em;line-height:.78;margin-bottom:-.04em}
+.sum-line span:last-child{text-align:right;padding-right:5px}
+.sum-line .plus-sign{text-align:center;padding-left:0;grid-column:1}
+#irasbeli-placeholder{display:none}
+#writtenA,#writtenOnes{grid-column:3;text-align:right;padding-right:5px}
+#writtenB{grid-column:3;text-align:right;padding-right:5px}
+.sum-rule{height:3px;background:var(--ink);margin:3px 0 4px}
+.answer-line{color:#23865e;min-height:1.15em}
+.answer-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.answer-side{border:1px solid var(--line);border-radius:16px;padding:10px;background:#f8fafc;min-width:0}
+.answer-heading{text-align:center;font-size:.76rem;font-weight:900;color:var(--muted);margin:3px 0 9px}
+.carry-choice{display:block;width:100%;min-height:58px;margin:7px 0;padding:9px 6px;border:2px solid #d6a02e;border-radius:12px;background:#fff2d3;color:#76500a;font-weight:900;font-size:clamp(.78rem,2.7vw,1rem)}
+.carry-choice.selected,.digit.selected{background:#23865e;color:white;border-color:#176d4b}
+.digit-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.digit{min-width:0;min-height:48px;border:2px solid var(--line);border-radius:10px;background:white;color:var(--ink);font-size:1.35rem;font-weight:900}
+.digit:disabled,.carry-choice:disabled{opacity:.65;cursor:default}
+@media(max-width:390px){.answer-columns{gap:7px}.answer-side{padding:7px}.carry-choice{font-size:.72rem;min-height:56px}.digit-grid{gap:4px}.digit{min-height:43px}}
+.small{font-size:.88rem;color:var(--muted);text-align:center}
+@keyframes pop{from{opacity:0;transform:scale(.25)}to{opacity:1;transform:scale(1)}}
+@keyframes travel{from{transform:translateY(-16px) scale(.7);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@media(max-width:420px){main{padding:10px}.panel{border-radius:17px}.action-grid{gap:8px}.action{font-size:.82rem;padding:9px 4px}.tab{padding:9px 14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="kicker">MATEMATIKA • 3. OSZTÁLY</div>
+<h1>Vigyázz, tízes lesz belőle!</h1>
+<p class="subtitle">Először nézd meg, aztán próbáld ki!</p>
+</header>
+<nav class="tabs" aria-label="Játékmód">
+<button class="tab active" id="demoTab">👀 Szemléltetés</button>
+<button class="tab" id="practiceTab">✏️ Gyakorlás</button>
+</nav>
+
+<section class="panel" id="demoPanel">
+<div class="topline"><span id="demoStep">1. lépés / 3</span><span>Bemutató</span></div>
+<div class="equation" id="demoEquation">6 + 8 = 14</div>
+<div class="instruction" id="demoInstruction">Hat kék és nyolc sárga korongot összeadunk.</div>
+<div class="coins" id="demoCoins" aria-label="Korongok"></div>
+<div class="message" id="demoMessage" aria-live="polite">Összesen 14 egyesünk van.</div>
+<div class="action-grid" id="demoActions">
+<button class="action left" id="carryDemo"><span>MARADT AZ EGY!</span><span class="number">1</span></button>
+<button class="action right" id="writeDemo"><span>LEÍROM A NÉGYET!</span><span class="number">4</span></button>
+</div>
+<div class="controls hidden" id="demoContinue">
+<button class="primary" id="goPractice">Jöhet a gyakorlás! →</button>
+</div>
+<div class="controls"><button class="secondary" id="restartDemo">Bemutató újra</button></div>
+</section>
+
+<section class="panel hidden" id="practicePanel">
+<div class="topline"><span id="taskCounter">1 / 10. feladat</span><div class="progress"><span id="progressFill"></span></div></div>
+<div class="equation" id="taskEquation">7 + 5 = ?</div>
+<div class="instruction" id="taskInstruction">Felül a második szám, alul az első szám korongjai láthatók.</div>
+<div class="coins" id="taskCoins"></div>
+<div class="box purpose-box">
+ <strong>Miért csináljuk?</strong>
+ <div>Ha 10 egyes összegyűlik, abból 1 tízes lesz. Ezért a tíz egyest nem írjuk az egyesek helyére: a megmaradó egyeseket írjuk le, a tízest pedig megtartjuk a tízesekhez.</div>
+</div>
+<div class="written-work" aria-label="Az írásbeli összeadás">
+ <div class="place-head"><span></span><span>TÍZESEK</span><span>EGYESEK</span></div>
+ <div class="carry-line"><span id="writtenCarry"></span><span></span></div>
+ <div class="sum-line"><span></span><span id="writtenA"></span></div>
+ <div class="sum-line"><span class="plus-sign">+</span><span id="writtenB"></span></div>
+ <div class="sum-rule"></div>
+ <div class="sum-line answer-line"><span id="writtenOnes"></span></div>
+</div>
+<div class="message" id="taskMessage" aria-live="polite">Először a jobb oldalon válaszd ki, mit írsz le!</div>
+<div class="answer-columns">
+ <div class="answer-side">
+  <div class="answer-heading">BAL OLDALT VÁLASZD KI</div>
+  <button class="carry-choice" id="carryOne">MARADT AZ EGY!</button>
+  <button class="carry-choice" id="carryNone">NEM MARADT SEMMI!</button>
+ </div>
+ <div class="answer-side">
+  <div class="answer-heading" style="font-size:1rem;color:#23865e">LEÍROM A...</div>
+  <div class="digit-grid" id="digitChoices" aria-label="Válaszd ki, melyik számot írod le"></div>
+ </div>
+</div>
+<div class="controls">
+<button class="secondary" id="resetTask">Újrakezdés</button>
+</div>
+</section>
+
+<section class="panel hidden" id="finishPanel">
+<div class="equation">🏆</div><h2 style="text-align:center">Ügyes vagy!</h2>
+<p class="instruction">Végiggyakoroltad az egyesek összeadását és a tízesátlépést.</p>
+<div class="controls"><button class="primary" id="playAgain">Új játék</button></div>
+</section>
+<p class="small" style="margin:15px 4px 0">Érintőképernyőn, interaktív táblán, számítógépen és telefonon is használható.</p>
+<p class="small" style="margin:8px 4px 2px;font-size:.78rem;opacity:.72">Készítette: Fodorné Varkoly Mária</p>
+</main>
+<script>
+(()=>{
+const $ = id => document.getElementById(id);
+const tasks = [
+  [8,4],
+  [6,5],
+  [7,5],
+  [4,3],
+  [9,4],
+  [8,6],
+  [6,7],
+  [2,5],
+  [8,5],
+  [9,6],
+  [7,8],
+  [3,4],
+  [6,9],
+  [5,7],
+  [8,7],
+  [1,6],
+  [9,8],
+  [7,6],
+  [4,8],
+  [5,2],
+  [5,9],
+  [3,9],
+  [2,9],
+  [4,4],
+  [6,8],
+  [7,5],
+  [8,3],
+  [2,6],
+  [9,7],
+  [6,6],
+  [5,8],
+  [3,5],
+  [8,9],
+  [7,4],
+  [6,5],
+  [1,7],
+  [9,3],
+  [8,8],
+  [7,6],
+  [4,5]
+];
+let demoStep = 1, index = 0, carryChosen = null, digitChosen = null, solved = false, advanceTimer = null, retryTimer = null;
+
+function makeCoins(el, a, b, grouped = false, stacked = false) {
+  el.innerHTML = '';
+  const total = a + b;
+  if (stacked) {
+    const stacks = document.createElement('div');
+    stacks.className = 'practice-stacks';
+    // The upper row shows the second addend; the lower row shows the first addend.
+    [[b, 'FELÜL', 'gold'], [a, 'ALUL', 'blue']].forEach(([count, label, color]) => {
+      const row = document.createElement('div');
+      row.className = 'practice-row';
+      for (let i = 0; i < count; i++) {
+        const coin = document.createElement('span');
+        coin.className = 'coin ' + color;
+        coin.style.animationDelay = (i * 0.035) + 's';
+        row.appendChild(coin);
+      }
+      stacks.appendChild(row);
+    });
+    el.appendChild(stacks);
+  } else if (grouped) {
+    const rod = document.createElement('div');
+    rod.className = 'ten-group';
+    rod.setAttribute('aria-label', 'Tíz korongból álló tízesrúd');
+    for (let i = 0; i < 10; i++) {
+      const cell = document.createElement('span');
+      cell.className = 'ten-cell';
+      rod.appendChild(cell);
+    }
+    el.appendChild(rod);
+    const rest = document.createElement('div');
+    rest.className = 'remaining';
+    rest.style.flexBasis = '100%';
+    for (let i = 0; i < total - 10; i++) {
+      const coin = document.createElement('span');
+      coin.className = 'coin';
+      coin.style.background = '#d69a26';
+      rest.appendChild(coin);
+    }
+    el.appendChild(rest);
+  } else {
+    for (let i = 0; i < total; i++) {
+      const coin = document.createElement('span');
+      coin.className = 'coin ' + (i < a ? 'blue' : 'gold');
+      coin.style.animationDelay = (i * 0.045) + 's';
+      el.appendChild(coin);
+    }
+  }
+}
+function showDemo() {
+  demoStep = 1;
+  $('demoStep').textContent = '1. lépés / 3';
+  $('demoEquation').textContent = '6 + 8 = 14';
+  $('demoInstruction').textContent = 'Hat kék és nyolc sárga korongot összeadunk.';
+  makeCoins($('demoCoins'), 6, 8);
+  $('demoMessage').textContent = 'Összesen 14 egyesünk van.';
+  $('demoActions').classList.remove('hidden');
+  $('demoContinue').classList.add('hidden');
+  $('carryDemo').disabled = false;
+  $('writeDemo').disabled = false;
+  $('carryDemo').classList.remove('done');
+  $('writeDemo').classList.remove('done');
+}
+function carryDemo() {
+  if (demoStep >= 2) return;
+  demoStep = 2;
+  $('demoStep').textContent = '2. lépés / 3';
+  $('demoInstruction').textContent = 'Tíz korong összefogódik: egy tízes lesz belőlük.';
+  makeCoins($('demoCoins'), 6, 8, true);
+  $('demoMessage').textContent = 'Pontosan 10 korongból lett 1 tízes. 4 korong maradt.';
+  $('carryDemo').disabled = true;
+  $('carryDemo').classList.add('done');
+}
+function writeDemo() {
+  if (demoStep === 1) carryDemo();
+  if (demoStep >= 3) return;
+  demoStep = 3;
+  $('demoStep').textContent = '3. lépés / 3';
+  $('demoInstruction').textContent = 'A maradék négy egyest leírjuk. Az egy tízest megtartjuk.';
+  $('demoMessage').textContent = 'MARADT AZ EGY!  •  LEÍROM A NÉGYET!';
+  $('writeDemo').disabled = true;
+  $('writeDemo').classList.add('done');
+  $('demoContinue').classList.remove('hidden');
+}
+function setMode(mode) {
+  $('demoPanel').classList.toggle('hidden', mode !== 'demo');
+  $('practicePanel').classList.toggle('hidden', mode !== 'practice');
+  $('finishPanel').classList.add('hidden');
+  $('demoTab').classList.toggle('active', mode === 'demo');
+  $('practiceTab').classList.toggle('active', mode === 'practice');
+}
+function startPractice() {
+  index = 0;
+  setMode('practice');
+  loadTask();
+}
+function loadTask() {
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+  if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
+  if (index >= tasks.length) {
+    $('practicePanel').classList.add('hidden');
+    $('finishPanel').classList.remove('hidden');
+    return;
+  }
+  const [a, b] = tasks[index];
+  carryChosen = null;
+  digitChosen = null;
+  solved = false;
+  $('taskCounter').textContent = (index + 1) + ' / ' + tasks.length + '. feladat';
+  $('progressFill').style.width = (index / tasks.length * 100) + '%';
+  $('taskEquation').textContent = a + ' + ' + b + ' = ?';
+  $('taskInstruction').textContent = 'Felül a második szám (' + b + '), alul az első szám (' + a + ') korongjai láthatók.';
+  makeCoins($('taskCoins'), a, b, false, true);
+  $('writtenA').textContent = a;
+  $('writtenB').textContent = b;
+  $('writtenCarry').textContent = '';
+  $('writtenOnes').textContent = '';
+  $('carryOne').disabled = true;
+  $('carryNone').disabled = true;
+  $('carryOne').classList.remove('selected');
+  $('carryNone').classList.remove('selected');
+  $('digitChoices').innerHTML = '';
+  $('taskMessage').textContent = 'Elsőként a jobb oldalon válaszd ki, melyik számot írod le!';
+  for (let n = 0; n <= 9; n++) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'digit';
+    btn.textContent = n;
+    btn.setAttribute('aria-label', 'Leírom a ' + n + '-t');
+    btn.title = 'Leírom a ' + n + '-t';
+    btn.addEventListener('click', () => chooseDigit(n));
+    $('digitChoices').appendChild(btn);
+  }
+}
+function chooseDigit(value) {
+  if (solved) return;
+  digitChosen = value;
+  // A gyermek a választását a másik számra koppintva még javíthassa.
+  [...$('digitChoices').children].forEach(btn => {
+    btn.disabled = false;
+    btn.classList.toggle('selected', Number(btn.textContent) === value);
+  });
+  // Ha már választott bal oldali választ, az új egyeshez azt is válassza ki újra.
+  carryChosen = null;
+  $('carryOne').classList.remove('selected');
+  $('carryNone').classList.remove('selected');
+  $('carryOne').disabled = false;
+  $('carryNone').disabled = false;
+  $('writtenCarry').textContent = '';
+  $('writtenOnes').textContent = value;
+  $('taskMessage').textContent = 'Leírtad a ' + value + '-t. Ha szeretnéd, még javíthatod; utána válaszd ki bal oldalon, maradt-e egy tízes!';
+}
+function chooseCarry(value) {
+  if (solved || digitChosen === null || carryChosen !== null) return;
+  carryChosen = value;
+  $('carryOne').classList.toggle('selected', value === 1);
+  $('carryNone').classList.toggle('selected', value === 0);
+  $('carryOne').disabled = true;
+  $('carryNone').disabled = true;
+  $('writtenCarry').textContent = value === 1 ? '1' : '';
+  checkAnswers();
+}
+function checkAnswers() {
+  if (carryChosen === null || digitChosen === null) return;
+  const [a, b] = tasks[index];
+  const total = a + b;
+  const correctCarry = Math.floor(total / 10);
+  const correctDigit = total % 10;
+  if (carryChosen === correctCarry && digitChosen === correctDigit) {
+    solved = true;
+    $('taskMessage').textContent = '✓ Helyes! ' +
+      (correctCarry === 1 ? 'Maradt az egy tízes, ezt felírjuk a tízesekhez.' : 'Nem maradt tízes.') +
+      ' A ' + correctDigit + '-t leírtuk az egyesek helyére.';
+    $('progressFill').style.width = ((index + 1) / tasks.length * 100) + '%';
+    advanceTimer = setTimeout(() => { index++; loadTask(); }, 2600);
+  } else {
+    $('taskMessage').textContent = 'Nézd meg újra a korongokat! Először a leírandó egyeseket, majd a megmaradt tízest válaszd ki.';
+    retryTimer = setTimeout(() => {
+      if (solved) return;
+      carryChosen = null;
+      digitChosen = null;
+      $('writtenCarry').textContent = '';
+      $('writtenOnes').textContent = '';
+      $('carryOne').disabled = true;
+      $('carryNone').disabled = true;
+      $('carryOne').classList.remove('selected');
+      $('carryNone').classList.remove('selected');
+      [...$('digitChoices').children].forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('selected');
+      });
+      $('taskMessage').textContent = 'Próbáld újra! Először jobb oldalon válaszd ki: LEÍROM A...';
+    }, 1700);
+  }
+}
+$('carryDemo').addEventListener('click', carryDemo);
+$('writeDemo').addEventListener('click', writeDemo);
+$('goPractice').addEventListener('click', startPractice);
+$('restartDemo').addEventListener('click', showDemo);
+$('demoTab').addEventListener('click', () => setMode('demo'));
+$('practiceTab').addEventListener('click', startPractice);
+$('carryOne').addEventListener('click', () => chooseCarry(1));
+$('carryNone').addEventListener('click', () => chooseCarry(0));
+$('resetTask').addEventListener('click', loadTask);
+$('playAgain').addEventListener('click', () => { showDemo(); setMode('demo'); });
+showDemo();
+})();
+</script>
+</body>
+</html>
