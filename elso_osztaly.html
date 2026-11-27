@@ -17,8 +17,10 @@ header p{max-width:720px;margin:28px auto 0;font-size:19px;line-height:1.55}
 main{max-width:1120px;margin:auto;padding:18px 22px 60px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:22px}
 .card{overflow:hidden;background:white;border:5px solid white;border-radius:28px;box-shadow:0 10px 28px #33446620}
-.art{min-height:145px;display:grid;place-items:center;font-size:76px}
-.yellow .art,.yellow .body{background:#fff2c7}.green .art,.green .body{background:#e8ffd9}.pink .art,.pink .body{background:#ffe3ed}.blue .art,.blue .body{background:#dff4ff}
+.art{height:185px;overflow:hidden;background:#dff4ff}
+.art img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.placeholder{height:185px;display:grid;place-items:center;font-size:72px}
+.yellow .placeholder,.yellow .body{background:#fff2c7}.green .placeholder,.green .body{background:#e8ffd9}.pink .placeholder,.pink .body{background:#ffe3ed}.blue .placeholder,.blue .body{background:#dff4ff}
 .body{padding:20px;min-height:205px;text-align:center}
 h2{margin:0 0 12px;font-size:23px}.body p{margin:0 0 18px;line-height:1.5;font-size:17px}
 .button,.soon{display:inline-block;padding:11px 20px;border-radius:24px;font-weight:bold}
@@ -33,10 +35,10 @@ footer{text-align:center;padding:25px;color:#6b7391}
 <h1>🌟 1. osztály 🌟</h1>
 <p>Ismerkedjünk a számokkal! Játékos feladatok, számolás és vidám gyakorlás vár rád.</p></header>
 <main><section class="grid" id="feladatok">
-<article class="card yellow"><div class="art">🐊 🐟</div><div class="body"><h2>Falánk krokodil</h2><p>Hasonlítsd össze a számokat! Melyik a nagyobb, melyik a kisebb?</p><a class="button" href="falank_krokodil.html">Játék indítása</a></div></article>
-<article class="card green"><div class="art">🔢 ⭐</div><div class="body"><h2>Számok birodalma</h2><p>Számismeret és játékos feladatok az első osztályosoknak.</p><span class="soon">Hamarosan feltöltjük</span></div></article>
-<article class="card pink" id="gyakorlas"><div class="art">🧩 ➕</div><div class="body"><h2>Számok bontása</h2><p>Fedezd fel, hogyan bonthatjuk fel a számokat többféleképpen!</p><span class="soon">Hamarosan feltöltjük</span></div></article>
-<article class="card blue"><div class="art">🎈 ✏️</div><div class="body"><h2>Összeadás és kivonás</h2><p>Játékos alapozás és gyakorlás a tanult számkörben.</p><span class="soon">Hamarosan feltöltjük</span></div></article>
+<article class="card yellow"><div class="art"><img src="falank_krokodil_jatekkep.png" alt="A Falánk krokodil összehasonlító játék képernyőképe"></div><div class="body"><h2>Falánk krokodil</h2><p>Hasonlítsd össze a számokat! Melyik a nagyobb, melyik a kisebb?</p><a class="button" href="falank_krokodil.html">Játék indítása</a></div></article>
+<article class="card green"><div class="placeholder">🔢 ⭐</div><div class="body"><h2>Számok birodalma</h2><p>Számismeret és játékos feladatok az első osztályosoknak.</p><span class="soon">Hamarosan feltöltjük</span></div></article>
+<article class="card pink" id="gyakorlas"><div class="placeholder">🧩 ➕</div><div class="body"><h2>Számok bontása</h2><p>Fedezd fel, hogyan bonthatjuk fel a számokat többféleképpen!</p><span class="soon">Hamarosan feltöltjük</span></div></article>
+<article class="card blue"><div class="placeholder">🎈 ✏️</div><div class="body"><h2>Összeadás és kivonás</h2><p>Játékos alapozás és gyakorlás a tanult számkörben.</p><span class="soon">Hamarosan feltöltjük</span></div></article>
 </section></main>
 <footer>Marika néni weboldala · Játékos tanulás és örömteli gyakorlás</footer>
 </body></html>
